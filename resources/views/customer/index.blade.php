@@ -85,11 +85,11 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $cust->notelp ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $cust->emailid ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm">
-                                <button
+                                <button onclick="openCustomerModal_edit({{ json_encode($cust) }})"
                                     class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors duration-150 border border-red-100">
                                     <i class="bi bi-pen"></i>
                                 </button>
-                                <button
+                                <button onclick="openCustomerModal_delete({{ json_encode($cust) }})"
                                     class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors duration-150 border border-gray-200">
                                     <i class="bi bi-trash3"></i>
                                 </button>
@@ -103,9 +103,17 @@
 
     <!-- Modal terpisah -->
     @include('customer.modal-add')
+    @include('customer.modal-edit')
+    @include('customer.modal-delete')
 
     @if($errors->any())
         <script>openCustomerModal();</script>
+    @endif
+    @if($errors->any())
+        <script>openCustomerModal_edit();</script>
+    @endif
+    @if($errors->any())
+        <script>openCustomerModal_edit();</script>
     @endif
 
 @endsection

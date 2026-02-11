@@ -40,4 +40,48 @@ class CustomerController extends Controller
 
         return redirect()->route('customer.index')->with('success', 'Customer berhasil ditambahkan!');
     }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi Input
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'bidang' => 'required|string|max:255',
+            'npwp' => 'required|string|max:255',
+            'notelp' => 'required|string|max:255',
+            'emailid' => 'required|email|max:255',
+            'lokasi' => 'required|string|max:255', // Cek email unik kecuali untuk ID ini
+            'alamat' => 'nullable|min:6', // Password opsional
+        ]);
+
+        // Cari User
+        $user = Customer::findOrFail($id);
+
+        // Update Data
+        $user->nama = $request->nama;
+        $user->bidang = $request->bidang;
+        $user->npwp = $request->npwp;
+        $user->notelp = $request->notelp;
+        $user->emailid = $request->emailid;
+        $user->lokasi = $request->lokasi;
+        $user->alamat = $request->alamat;
+
+        // Update Password Hanya Jika Ada
+
+
+        $user->save();
+
+        // Redirect dengan Pesan Sukses
+        return redirect()->route('customer.index')->with('success', 'User updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $Customer = Customer::findOrFail($id);
+        $Customer->delete();
+
+        return redirect()->route('customer.index')
+            ->with('success', 'Mekanik berhasil dihapus!');
+    }
+
 }

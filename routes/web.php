@@ -21,10 +21,13 @@ Route::middleware(['auth'])->group(function () {
     // Customer
     Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
     Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
+    Route::put('/customer/{id}', [CustomerController::class, 'update'])->name('customer.update');
+    Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 
     // Project
     Route::get('/project', [ProjectController::class, 'index'])->name('project.index');
     Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
+    Route::post('/project/{id}', [ProjectController::class, 'update'])->name('project.update');
     Route::get('/project/{project}', [ProjectController::class, 'show'])->name('project.show');
     Route::post('/project/{project}/agenda', [ProjectController::class, 'storeAgenda'])->name('project.agenda.store');
 
