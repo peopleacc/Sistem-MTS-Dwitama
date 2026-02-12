@@ -131,7 +131,7 @@
                     @endif
 
                     <!-- Add Agenda Form -->
-                    <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div id="tambah-agenda" class="mt-6 pt-6 border-t border-gray-100">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-10 h-10 rounded-full bg-red-50 border-2 border-dashed border-red-300 flex items-center justify-center">
                                 <i class="bi bi-plus-lg text-red-500"></i>

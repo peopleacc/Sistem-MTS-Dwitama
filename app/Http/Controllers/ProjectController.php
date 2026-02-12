@@ -10,8 +10,20 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('customer')->get();
-        return view("project.index", compact("projects"));
+        $user = auth()->user();
+
+        if (strtolower($user->role) === 'sales') {
+            $projects = Project::with('customer')
+                ->whereHas('customer', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })->get();
+            $customers = \App\Models\Customer::where('user_id', $user->id)->get();
+        } else {
+            $projects = Project::with('customer')->get();
+            $customers = \App\Models\Customer::all();
+        }
+
+        return view("project.index", compact("projects", "customers"));
     }
 
     public function store(Request $request)
@@ -88,26 +100,12 @@ class ProjectController extends Controller
         return view('project.show', compact('project'));
     }
 
-    public function storeAgenda(Request $request, $id)
+    public function destroy($id)
     {
         $project = Project::findOrFail($id);
+        $project->delete();
 
-        $request->validate([
-            'tgl' => 'required|date',
-            'jam' => 'nullable',
-            'lokasi' => 'nullable|string|max:50',
-            'ket' => 'required|string',
-        ]);
-
-        ProjectAgenda::create([
-            'project_id' => $project->project_id,
-            'tgl' => $request->tgl,
-            'jam' => $request->jam,
-            'lokasi' => $request->lokasi,
-            'ket' => $request->ket,
-            'status' => 0,
-        ]);
-
-        return redirect()->route('project.show', $project->project_id)->with('success', 'Agenda berhasil ditambahkan!');
+        return redirect()->route('project.index')
+            ->with('success', 'Project berhasil dihapus!');
     }
 }

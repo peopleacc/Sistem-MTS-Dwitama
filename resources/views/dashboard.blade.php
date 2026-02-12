@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <p class="text-white/80 text-sm font-medium">Total Customer</p>
-                <p class="text-3xl lg:text-4xl font-bold mt-1">{{ $tot_cus   }}</p>
+                <p class="text-3xl lg:text-4xl font-bold mt-1">{{ $tot_cus }}</p>
             </div>
         </div>
 
@@ -63,159 +63,289 @@
         </div>
     </div>
 
-    <!-- Data Table Section -->
-    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <!-- Table Header -->
-        <div
-            class="px-5 lg:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gradient-to-r from-gray-50 to-white">
-            <div class="flex items-center gap-3">
-                <div class="w-1 h-6 bg-red-500 rounded-full"></div>
-                <h3 class="text-lg font-bold text-gray-800">Data Project</h3>
+    {{-- Charts Section (Admin Only) --}}
+    @if(!$isSales)
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6">
+            {{-- Doughnut Chart: Project per Status --}}
+            <div class="bg-white rounded-2xl shadow-lg p-5 lg:p-6">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-1 h-6 bg-red-500 rounded-full"></div>
+                    <h3 class="text-lg font-bold text-gray-800">Project per Status</h3>
+                </div>
+                <div class="flex items-center justify-center" style="height: 280px;">
+                    <canvas id="chartStatus"></canvas>
+                </div>
             </div>
 
-            <!-- Search & Add Button -->
-            <div class="flex items-center gap-3">
-                <!-- Search Input -->
-                <div class="relative">
-                    <input type="text" placeholder="Pencarian..."
-                        class="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-48">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+            {{-- Bar Chart: Project per Bulan --}}
+            <div class="bg-white rounded-2xl shadow-lg p-5 lg:p-6">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-1 h-6 bg-rose-500 rounded-full"></div>
+                    <h3 class="text-lg font-bold text-gray-800">Project per Bulan</h3>
                 </div>
-
-                <!-- Add Button -->
-                <button
-                    class="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg shadow-red-500/20">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah
-                </button>
+                <div style="height: 280px;">
+                    <canvas id="chartBulanan"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Desktop Table -->
+        {{-- Horizontal Bar Chart: Top 5 Sales --}}
+        <div class="bg-white rounded-2xl shadow-lg p-5 lg:p-6 mb-6">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-1 h-6 bg-red-500 rounded-full"></div>
+                <h3 class="text-lg font-bold text-gray-800">Top 5 Sales (by Project)</h3>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="chartTopSales"></canvas>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // ── Doughnut: Project per Status ──
+                new Chart(document.getElementById('chartStatus'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: {!! json_encode($chartStatus['labels']) !!},
+                        datasets: [{
+                            data: {!! json_encode($chartStatus['data']) !!},
+                            backgroundColor: [
+                                'rgba(239, 68, 68, 0.85)',   // red   – Progress
+                                'rgba(245, 158, 11, 0.85)',   // amber – Pending
+                                'rgba(34, 197, 94, 0.85)',    // green – Selesai
+                            ],
+                            borderColor: [
+                                'rgba(239, 68, 68, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(34, 197, 94, 1)',
+                            ],
+                            borderWidth: 2,
+                            hoverOffset: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyleWidth: 10,
+                                    font: { family: 'Inter', size: 13 }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // ── Bar: Project per Bulan ──
+                new Chart(document.getElementById('chartBulanan'), {
+                    type: 'bar',
+                    data: {
+                        labels: {!! json_encode($chartBulanan['labels']) !!},
+                        datasets: [{
+                            label: 'Jumlah Project',
+                            data: {!! json_encode($chartBulanan['data']) !!},
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            barPercentage: 0.6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { family: 'Inter', size: 12 }
+                                },
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            x: {
+                                ticks: { font: { family: 'Inter', size: 11 } },
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+
+                // ── Horizontal Bar: Top 5 Sales ──
+                new Chart(document.getElementById('chartTopSales'), {
+                    type: 'bar',
+                    data: {
+                        labels: {!! json_encode($chartTopSales['labels']) !!},
+                        datasets: [{
+                            label: 'Total Project',
+                            data: {!! json_encode($chartTopSales['data']) !!},
+                            backgroundColor: [
+                                'rgba(239, 68, 68, 0.80)',
+                                'rgba(251, 113, 133, 0.80)',
+                                'rgba(244, 63, 94, 0.80)',
+                                'rgba(225, 29, 72, 0.80)',
+                                'rgba(190, 18, 60, 0.80)',
+                            ],
+                            borderColor: [
+                                'rgba(239, 68, 68, 1)',
+                                'rgba(251, 113, 133, 1)',
+                                'rgba(244, 63, 94, 1)',
+                                'rgba(225, 29, 72, 1)',
+                                'rgba(190, 18, 60, 1)',
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.5,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { family: 'Inter', size: 12 }
+                                },
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            y: {
+                                ticks: { font: { family: 'Inter', size: 13 } },
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            });
+        </script>
+    @endif
+
+    {{-- Data Table: 10 Project Terbaru --}}
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {{-- Table Header --}}
+        <div class="px-5 lg:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gradient-to-r from-gray-50 to-white">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-6 bg-red-500 rounded-full"></div>
+                <h3 class="text-lg font-bold text-gray-800">10 Project Terbaru</h3>
+            </div>
+            <a href="{{ route('project.index') }}"
+                class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
+                Lihat Semua
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+        {{-- Desktop Table --}}
         <div class="hidden sm:block overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Project
-                            ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Customer</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Lokasi
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status
-                        </th>
-                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Operation</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Project</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Lokasi</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @for($i = 1; $i <= 5; $i++)
+                    @forelse($projects as $i => $project)
                         <tr class="hover:bg-red-50/50 transition-colors duration-150">
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $i }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-800 font-medium">PRJ-{{ str_pad($i, 4, '0', STR_PAD_LEFT) }}
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $i + 1 }}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-semibold text-gray-800">{{ $project->project_name }}</div>
+                                <div class="text-xs text-gray-400 mt-0.5">ID: {{ $project->project_id }}</div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">Customer {{ $i }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">Jakarta</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $project->customer->nama ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $project->lokasi ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm">
-                                @if($i % 3 == 0)
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                                        Selesai
+                                @if($project->status == 2)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>Selesai
                                     </span>
-                                @elseif($i % 2 == 0)
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                                        <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
-                                        Pending
+                                @elseif($project->status == 1)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                        <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>Pending
                                     </span>
                                 @else
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
-                                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
-                                        Progress
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
+                                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>Progress
                                     </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors duration-150 border border-red-100">
-                                        <i class="bi bi-pen"></i>
-                                    </button>
-                                    <button
-                                        class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors duration-150 border border-gray-200">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
+                                <a href="{{ route('project.show', $project->project_id) }}"
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-xs font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md shadow-red-500/20">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center">
+                                <div class="flex flex-col items-center gap-2">
+                                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-400">Belum ada project</p>
                                 </div>
                             </td>
                         </tr>
-                    @endfor
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Mobile Cards -->
+        {{-- Mobile Cards --}}
         <div class="sm:hidden divide-y divide-gray-100">
-            @for($i = 1; $i <= 5; $i++)
+            @forelse($projects as $project)
                 <div class="p-4 hover:bg-red-50/50 transition-colors duration-150">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <span class="text-xs text-gray-400">PRJ-{{ str_pad($i, 4, '0', STR_PAD_LEFT) }}</span>
-                            <div class="text-sm font-semibold text-gray-800">Customer {{ $i }}</div>
+                            <span class="text-xs text-gray-400">ID: {{ $project->project_id }}</span>
+                            <div class="text-sm font-semibold text-gray-800">{{ $project->project_name }}</div>
                         </div>
-                        @if($i % 3 == 0)
-                            <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Selesai</span>
-                        @elseif($i % 2 == 0)
-                            <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Pending</span>
+                        @if($project->status == 2)
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Selesai</span>
+                        @elseif($project->status == 1)
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Pending</span>
                         @else
-                            <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">Progress</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">Progress</span>
                         @endif
                     </div>
-                    <div class="text-xs text-gray-400 mb-2">Jakarta</div>
-                    <div class="flex gap-2">
-                        <button
-                            class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium border border-red-100">Update</button>
-                        <button
-                            class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium border border-gray-200">Delete</button>
-                    </div>
+                    <div class="text-xs text-gray-500 mb-1">{{ $project->customer->nama ?? '-' }}</div>
+                    <div class="text-xs text-gray-400 mb-3">{{ $project->lokasi ?? '-' }}</div>
+                    <a href="{{ route('project.show', $project->project_id) }}"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-xs font-medium hover:from-red-600 hover:to-red-700 transition-all shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        View
+                    </a>
                 </div>
-            @endfor
-        </div>
-
-        <!-- Pagination -->
-        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
-            <div class="text-sm text-gray-500">
-                Showing 1 to 5 of 48 entries
-            </div>
-            <div class="flex items-center gap-1">
-                <button
-                    class="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 rounded-lg transition-colors duration-150">
-                    &laquo;
-                </button>
-                <button class="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg shadow-sm">1</button>
-                <button
-                    class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-150">2</button>
-                <button
-                    class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-150">3</button>
-                <span class="px-2 text-gray-400">...</span>
-                <button
-                    class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-150">10</button>
-                <button
-                    class="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 rounded-lg transition-colors duration-150">
-                    &raquo;
-                </button>
-            </div>
+            @empty
+                <div class="p-6 text-center text-sm text-gray-400">Belum ada project</div>
+            @endforelse
         </div>
     </div>
 

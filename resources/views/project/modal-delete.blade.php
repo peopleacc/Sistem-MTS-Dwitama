@@ -1,9 +1,9 @@
-<!-- Delete Customer Modal -->
-<div id="addCustomerModal_delete" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeCustomerModal_delete()"></div>
+<!-- Delete Project Modal -->
+<div id="deleteProjectModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDeleteProjectModal()"></div>
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all scale-95 opacity-0"
-            id="customerModalContent_delete">
+            id="deleteProjectModalContent">
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center gap-3">
                     <div
@@ -14,11 +14,11 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800">Hapus Customer</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Hapus Project</h3>
                         <p class="text-xs text-gray-400">Tindakan ini tidak dapat dibatalkan</p>
                     </div>
                 </div>
-                <button onclick="closeCustomerModal_delete()"
+                <button onclick="closeDeleteProjectModal()"
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -27,32 +27,32 @@
                 </button>
             </div>
 
-            <form action="#" method="POST" id="deleteCustomerForm" class="p-6 space-y-4">
-                @method ('DELETE')
+            <form action="#" id="deleteProjectForm" method="POST" class="p-6 space-y-4">
+                @method('DELETE')
                 @csrf
 
                 <div class="space-y-3">
-                    <p class="text-sm text-gray-600">Apakah Anda yakin ingin menghapus customer berikut?</p>
+                    <p class="text-sm text-gray-600">Apakah Anda yakin ingin menghapus project berikut?</p>
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="flex justify-between items-center">
                             <div>
-                                <p class="text-xs text-gray-500 uppercase tracking-wide">Nama Customer</p>
-                                <p class="text-sm font-semibold text-gray-800 mt-1" id="delete_cust_nama"></p>
+                                <p class="text-xs text-gray-500 uppercase tracking-wide">Nama Project</p>
+                                <p class="text-sm font-semibold text-gray-800 mt-1" id="delete_project_name"></p>
                             </div>
                             <div class="text-right">
                                 <p class="text-xs text-gray-500 uppercase tracking-wide">ID</p>
-                                <p class="text-sm font-mono text-gray-600 mt-1" id="delete_cust_id"></p>
+                                <p class="text-sm font-mono text-gray-600 mt-1" id="delete_project_id"></p>
                             </div>
                         </div>
                     </div>
                     <p class="text-sm text-red-600 font-medium">
                         <i class="bi bi-exclamation-triangle"></i>
-                        Customer yang dihapus tidak dapat dipulihkan!
+                        Project yang dihapus tidak dapat dipulihkan!
                     </p>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                    <button type="button" onclick="closeCustomerModal_delete()"
+                    <button type="button" onclick="closeDeleteProjectModal()"
                         class="px-5 py-2.5 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-all">
                         Batal
                     </button>
@@ -71,38 +71,37 @@
 </div>
 
 <script>
-    function openCustomerModal_delete(data) {
-        const modal = document.getElementById('addCustomerModal_delete');
-        const form = document.getElementById('deleteCustomerForm');
-        const content = document.getElementById('customerModalContent_delete');
+    function openDeleteProjectModal(data) {
+        const modal = document.getElementById('deleteProjectModal');
+        const content = document.getElementById('deleteProjectModalContent');
+        const form = document.getElementById('deleteProjectForm');
 
-        // Set customer info
-        document.getElementById('delete_cust_nama').textContent = data.nama;
-        document.getElementById('delete_cust_id').textContent = data.custid;
+        // Set project info
+        document.getElementById('delete_project_name').textContent = data.project_name;
+        document.getElementById('delete_project_id').textContent = data.project_id;
 
-        modal.classList.remove('hidden');
-
-        // Sesuaikan route
-        const text = "{{ route('customer.destroy', ':id') }}";
-        const update = text.replace(':id', data.custid);
+        // Update form action
+        const text = "{{ route('project.destroy', ':id') }}";
+        const update = text.replace(':id', data.project_id);
         form.action = update;
 
+        modal.classList.remove('hidden');
         setTimeout(() => {
             content.classList.remove('scale-95', 'opacity-0');
             content.classList.add('scale-100', 'opacity-100');
         }, 10);
     }
 
-    function closeCustomerModal_delete() {
-        const content = document.getElementById('customerModalContent_delete');
+    function closeDeleteProjectModal() {
+        const content = document.getElementById('deleteProjectModalContent');
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
         setTimeout(() => {
-            document.getElementById('addCustomerModal_delete').classList.add('hidden');
+            document.getElementById('deleteProjectModal').classList.add('hidden');
         }, 200);
     }
 
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeCustomerModal_delete();
+        if (e.key === 'Escape') closeDeleteProjectModal();
     });
 </script>

@@ -1,9 +1,10 @@
-<!-- Add Project Modal -->
-<div id="addProjectModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeProjectModal()"></div>
+<!-- Edit Project Modal -->
+<div id="editProjectModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeEditProjectModal()">
+    </div>
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-95 opacity-0"
-            id="projectModalContent">
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all scale-95 opacity-0"
+            id="editProjectModalContent">
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center gap-3">
                     <div
@@ -14,11 +15,11 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800">Tambah Project</h3>
-                        <p class="text-xs text-gray-400">Isi data project baru</p>
+                        <h3 class="text-lg font-bold text-gray-800">Edit Project</h3>
+                        <p class="text-xs text-gray-400">Ubah data project</p>
                     </div>
                 </div>
-                <button onclick="closeProjectModal()"
+                <button onclick="closeEditProjectModal()"
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -27,8 +28,9 @@
                 </button>
             </div>
 
-            <form action="{{ route('project.store') }}" method="POST" class="p-6 space-y-4">
+            <form action="#" id="editProjectForm" method="POST" class="p-6 space-y-4">
                 @csrf
+                @method('POST')
 
                 <!-- Nama Project -->
                 <div class="space-y-1.5">
@@ -41,7 +43,8 @@
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </span>
-                        <input type="text" name="project_name" required placeholder="Nama project"
+                        <input type="text" id="edit_project_name" name="project_name" required
+                            placeholder="Nama project"
                             class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all">
                     </div>
                 </div>
@@ -56,17 +59,17 @@
                                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                         </span>
-                        <select name="custid"
+                        <select id="edit_custid" name="custid"
                             class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all appearance-none">
                             <option value="">-- Pilih Customer --</option>
-                            @foreach(\App\Models\Customer::all() as $cust)
+                            @foreach($customers as $cust)
                                 <option value="{{ $cust->custid }}">{{ $cust->custid }} - {{ $cust->nama }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
 
-                <!-- Lokasi & Wilayah -->
+                <!-- Lokasi & Level -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-sm font-medium text-gray-700">Lokasi</label>
@@ -79,16 +82,16 @@
                                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </span>
-                            <input type="text" name="lokasi" placeholder="Contoh: Jakarta"
+                            <input type="text" id="edit_lokasi" name="lokasi" placeholder="Contoh: Jakarta"
                                 class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all">
                         </div>
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-sm font-medium text-gray-700">Level</label>
-                        <select name="level"
+                        <select id="edit_level" name="level"
                             class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all">
                             <option value="Low">Low</option>
-                            <option value="Medium" selected>Medium</option>
+                            <option value="Medium">Medium</option>
                             <option value="High">High</option>
                         </select>
                     </div>
@@ -104,7 +107,7 @@
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                         </span>
-                        <textarea name="alamat" rows="2" placeholder="Alamat lengkap project"
+                        <textarea id="edit_alamat" name="alamat" rows="2" placeholder="Alamat lengkap project"
                             class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all resize-none"></textarea>
                     </div>
                 </div>
@@ -112,12 +115,12 @@
                 <!-- Keterangan -->
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-gray-700">Keterangan</label>
-                    <textarea name="ket" rows="2" placeholder="Keterangan tambahan"
+                    <textarea id="edit_ket" name="ket" rows="2" placeholder="Keterangan tambahan"
                         class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none text-sm transition-all resize-none"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                    <button type="button" onclick="closeProjectModal()"
+                    <button type="button" onclick="closeEditProjectModal()"
                         class="px-5 py-2.5 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-all">
                         Batal
                     </button>
@@ -135,9 +138,24 @@
 </div>
 
 <script>
-    function openProjectModal() {
-        const modal = document.getElementById('addProjectModal');
-        const content = document.getElementById('projectModalContent');
+    function openEditProjectModal(data) {
+        const modal = document.getElementById('editProjectModal');
+        const content = document.getElementById('editProjectModalContent');
+        const form = document.getElementById('editProjectForm');
+
+        // Set form values
+        document.getElementById('edit_project_name').value = data.project_name;
+        document.getElementById('edit_custid').value = data.custid || '';
+        document.getElementById('edit_lokasi').value = data.lokasi || '';
+        document.getElementById('edit_level').value = data.level || 'Medium';
+        document.getElementById('edit_alamat').value = data.alamat || '';
+        document.getElementById('edit_ket').value = data.ket || '';
+
+        // Update form action
+        const text = "{{ route('project.update', ':id') }}";
+        const update = text.replace(':id', data.project_id);
+        form.action = update;
+
         modal.classList.remove('hidden');
         setTimeout(() => {
             content.classList.remove('scale-95', 'opacity-0');
@@ -145,16 +163,16 @@
         }, 10);
     }
 
-    function closeProjectModal() {
-        const content = document.getElementById('projectModalContent');
+    function closeEditProjectModal() {
+        const content = document.getElementById('editProjectModalContent');
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
         setTimeout(() => {
-            document.getElementById('addProjectModal').classList.add('hidden');
+            document.getElementById('editProjectModal').classList.add('hidden');
         }, 200);
     }
 
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeProjectModal();
+        if (e.key === 'Escape') closeEditProjectModal();
     });
 </script>

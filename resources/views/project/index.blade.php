@@ -105,11 +105,11 @@
                                     class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors duration-150 border border-blue-100 inline-block">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <button
+                                <button onclick="openEditProjectModal({{ json_encode($project) }})"
                                     class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors duration-150 border border-red-100">
                                     <i class="bi bi-pen"></i>
                                 </button>
-                                <button
+                                <button onclick="openDeleteProjectModal({{ json_encode($project) }})"
                                     class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors duration-150 border border-gray-200">
                                     <i class="bi bi-trash3"></i>
                                 </button>
@@ -124,6 +124,8 @@
 
     <!-- Modal terpisah -->
     @include('project.modal-add')
+    @include('project.modal-edit')
+    @include('project.modal-delete')
 
     @if($errors->any())
         <script>openProjectModal();</script>

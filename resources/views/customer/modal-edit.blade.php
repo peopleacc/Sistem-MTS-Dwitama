@@ -1,8 +1,8 @@
 <!-- Add Customer Modal -->
-<div id="addCustomerModal_edit" class="fixed inset-0 z-0 hidden" id="{{ $cust->custid }}">
+<div id="addCustomerModal_edit" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeCustomerModal()"></div>
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-95 opacity-0"
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all scale-95 opacity-0"
             id="customerModalContent_edit">
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center gap-3">
